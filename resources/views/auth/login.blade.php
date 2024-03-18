@@ -9,6 +9,8 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
+<img src="{{ asset('images/Logo_invert.png') }}" alt="Logo de la empresa" class="Logo"style="height: 50px;  width: 130px;">
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
