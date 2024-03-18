@@ -80,8 +80,8 @@ Route::middleware(['auth', 'verified', 'roles:ADMIN'])->group(function () {
 
     Route::get('/animals/{animal}/edit', [AnimalController::class,'edit'])
         ->name('animals.edit');
-    Route::post('/animals/{animal}/edit', [AnimalController::class,'edit'])
-        ->name('animals.edit');
+    /*Route::post('/animals/{animal}/edit', [AnimalController::class,'edit'])
+        ->name('animals.edit');*/
     Route::put('animals/{animal}',[AnimalController::class,'update'])
     ->name('Animals.update');
     Route::delete('animals/{animal}',[AnimalController::class,'destroy'])
