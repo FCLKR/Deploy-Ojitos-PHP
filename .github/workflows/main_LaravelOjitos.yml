@@ -63,4 +63,4 @@ jobs:
           app-name: 'LaravelOjitos'
           slot-name: 'production'
           package: .
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_0f1126300f084dfaa2a229252379b57f }}
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_11094c05f0d94c7383e0d8ab6b6c0d19 }}
