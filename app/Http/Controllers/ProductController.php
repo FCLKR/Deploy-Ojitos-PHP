@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use App\Models\ProductoVacuna;
+
 
 class ProductController extends Controller
 {
@@ -91,5 +94,20 @@ class ProductController extends Controller
     public function indexClient()
     {
         $products = Product::all();
-        return view('ProductUser.indexClient', compact('products'));    }
+
+        $vacunas = DB::table('vacunas')
+            ->join('producto_vacuna', 'vacunas.id', '=', 'producto_vacuna.vacuna_id')
+            ->select('vacunas.*', 'producto_vacuna.price as precio', 'producto_vacuna.producto_id')
+            ->get();
+
+        if ($vacunas->isEmpty()) {
+            $vacunas = null;
+        }
+
+        return view('ProductUser.indexClient', compact('products', 'vacunas'));
+    }
+    public function productoVacunas()
+    {
+        return $this->hasMany(ProductoVacuna::class, 'producto_id', 'id_product');
+    }
 }

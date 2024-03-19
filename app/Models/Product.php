@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductoVacuna;
+
 
 class Product extends Model
 {
@@ -21,4 +23,9 @@ class Product extends Model
     {
         return $this->hasMany(FacturaDetail::class, 'product_id_product');
     }
+    public function productoVacunas()
+    {
+        return $this->hasMany(ProductoVacuna::class, 'producto_id', 'id_product');
+    }
+
 }

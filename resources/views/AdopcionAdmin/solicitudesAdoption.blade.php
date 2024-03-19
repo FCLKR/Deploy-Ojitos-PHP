@@ -301,38 +301,31 @@
 
 
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap">
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Gestion Adopcion') }}
-        </h2>
-    </x-slot>
+@extends('layouts.newlayout')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+@section('title', 'Gestion Adopcion')
 
-                    <div class="mt-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg divide-y dark:divide-gray-900">
-                        <div class="container relative">
-                            <div class="flex sm:justify-between h-8">
-                                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                                    {{ __('Solcitudes de Adopcion') }}
-                                </h2>
-                                <x-primary-button class="flex sm:justify-between h-8" id="toggleButton">Ocultar Tabla</x-primary-button>
-                                <x-text-input id="buscar" type="text" placeholder="Buscar..." class="hidden sm:flex sm:items-right sm:ml-3"></x-text-input>
-                            </div>
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">{{ __('Solicitudes de Adopcion') }}</h2>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-primary" id="toggleButton">Ocultar Tabla</button>
+                            <label for="buscar"></label><input type="text" id="buscar" class="form-control" placeholder="Buscar...">
                         </div>
-
-                        <div id="tableContainer" style="display: block;">
-                            <table id="dataTable">
+                    </div>
+                    <div class="card-body">
+                        <div id="tableContainer">
+                            <table id="dataTable" class="table table-bordered">
                                 <thead>
                                 <tr>
                                     <th>Imagen</th>
                                     <th>Nombre</th>
-                                    <th class="obs">Fecha solicitud</th>
-                                    <th class="esp">Especie</th>
+                                    <th>Fecha solicitud</th>
+                                    <th>Especie</th>
                                     <th>Raza</th>
                                     <th>Edad (Meses)</th>
                                     <th>Requerido por:</th>
@@ -341,7 +334,6 @@
                                     <th>Estado Solicitud</th>
                                 </tr>
                                 </thead>
-
                                 <tbody>
                                 @foreach($adopciones as $adopcion)
                                     <tr>
@@ -352,115 +344,94 @@
                                                 No hay imagen
                                             @endif
                                         </td>
-                                        <td>{{ $adopcion->animals->nombreAnimaladopocion}}</td>
-                                        <td class="fecha">{{ $adopcion->created_at }}</td>
+                                        <td>{{ $adopcion->animals->nombreAnimaladopocion }}</td>
+                                        <td>{{ $adopcion->created_at }}</td>
                                         <td>{{ $adopcion->animals->especie_Animal }}</td>
                                         <td>{{ $adopcion->animals->raza }}</td>
-                                        <td>{{ $adopcion->animals->age}}</td>
+                                        <td>{{ $adopcion->animals->age }}</td>
                                         <td>{{ $adopcion->users->name }}</td>
                                         <td>{{ $adopcion->users->document }}</td>
                                         <td>{{ $adopcion->probabilidad }}%</td>
-                                        <td class="statusrequest">
+                                        <td>
                                             {{ $adopcion->adoption_status }}
                                             @if($adopcion->created_at != $adopcion->updated_at)
-                                                <small class="text-sm text-black-600 dark:text-black-400">&middot; {{__('Actualizado')}}</small>
+                                                <small class="text-muted">&middot; {{ __('Actualizado') }}</small>
                                             @endif
                                             @if($adopcion->adoption_status != "Adoptado")
-                                                <x-primary-button class="mt-4 flex sm:justify-center h-1/5"  onclick="openInfoModal('{{ $adopcion->id_animaladopcion }}')">  @if($adopcion->adoption_status == "En proceso") Gestionar @else Ver @endif</x-primary-button>
+                                                <button class="btn btn-primary mt-2" onclick="openInfoModal('{{ $adopcion->id_animaladopcion }}')">
+                                                    @if($adopcion->adoption_status == "En proceso")
+                                                        Gestionar
+                                                    @else
+                                                        Ver
+                                                    @endif
+                                                </button>
                                             @endif
 
-                                            <!-- ******************MODAL PARA INFORMACIÓN***************-->
-                                            <div id="infoModal{{ $adopcion->id_animaladopcion}}" class="modaldes">
-                                                <div class="modal-contentdes ">
-                                                    <span class="close" onclick="closeInfoModal('{{$adopcion->id_animaladopcion}}')">&times;</span>
-                                                    <h2 style="font-weight: bold; margin-top: 0%">N° Registro: {{ $adopcion->id_animaladopcion }}</h2>
-                                                    <div class="modal-info-container py-1.5 px-3 ">
-                                                        <!-- Contenido de la información adicional del animal -->
-                                                        <div class="modal-column py-2">
-
-                                                            <img src="{{ $adopcion->animals->img }}" style="max-width: 50%; max-height: 50%;" alt="imagen" >
-                                                            <h2 class="Inf">Información adicional del animal</h2>
-                                                            <p>Nombre: {{ $adopcion->animals->nombreAnimaladopocion }}</p>
-                                                            <p>Especie: {{$adopcion->animals->especie_Animal }}</p>
-                                                            <p>Raza: {{$adopcion->animals->raza }}</p>
-                                                            <p>Edad(meses): {{$adopcion->animals->age }}</p>
-                                                            <p style="margin-top: 2%;">Observaciones: {{ $adopcion->animals->observacionesAnimal }}</p>
-
-                                                            <!-- BTNS DE GESTION-->
-                                                            <form id="aprobarForm{{ $adopcion->id_animaladopcion }}" action="{{route('AdopcionAdmin.aprobacion')}}" method="POST" style="display: none;">
+                                            <!-- Modal para información -->
+                                            <div id="infoModal{{ $adopcion->id_animaladopcion }}" class="modal fade" tabindex="-1" role="dialog">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">N° Registro: {{ $adopcion->id_animaladopcion }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <img src="{{ $adopcion->animals->img }}" style="max-width: 100%; max-height: 200px;" alt="imagen">
+                                                                    <h6 class="mt-3">Información adicional del animal</h6>
+                                                                    <p>Nombre: {{ $adopcion->animals->nombreAnimaladopocion }}</p>
+                                                                    <p>Especie: {{ $adopcion->animals->especie_Animal }}</p>
+                                                                    <p>Raza: {{ $adopcion->animals->raza }}</p>
+                                                                    <p>Edad (meses): {{ $adopcion->animals->age }}</p>
+                                                                    <p>Observaciones: {{ $adopcion->animals->observacionesAnimal }}</p>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <h6>Probabilidad de adopción:</h6>
+                                                                    <h3 class="text-center @if($adopcion->probabilidad < 40) text-danger @elseif($adopcion->probabilidad >= 40 && $adopcion->probabilidad < 60) text-warning @elseif($adopcion->probabilidad >= 60 && $adopcion->probabilidad < 80) text-success @elseif($adopcion->probabilidad >= 80) text-primary @endif">{{ $adopcion->probabilidad }}%</h3>
+                                                                    <h6 class="mt-3">Información adicional del solicitante</h6>
+                                                                    <p>Nombre: {{ $adopcion->users->name }} {{ $adopcion->users->lastname }}</p>
+                                                                    <p>Identificación: {{ $adopcion->users->document }}</p>
+                                                                    <p>Edad: {{ $adopcion->users->age }} años</p>
+                                                                    <p>E-mail: {{ $adopcion->users->email }}</p>
+                                                                    <p>Se unió a Ojitos: {{ $adopcion->users->created_at }}</p>
+                                                                    <p>Motivo de adopción: {{ $adopcion->motivo }}</p>
+                                                                    <a href="{{ route('admin.descargar-documento', ['userDocument' => $adopcion->id_animaladopcion]) }}" class="btn btn-primary">Ver documento</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <form id="rechazarForm{{ $adopcion->id_animaladopcion }}" action="{{ route('AdopcionAdmin.rechazarAdopcion') }}" method="POST" style="display: none;">
                                                                 @csrf
                                                                 <input type="hidden" name="animal_id" value="{{ $adopcion->id_animaladopcion }}">
                                                             </form>
-                                                            <div class="modal-container-buttons" style="display: flex; justify-content: space-between; margin-top: 3%; margin-right: 20%">
-                                                                    <form id="rechazarForm{{ $adopcion->id_animaladopcion }}" action="{{route('AdopcionAdmin.rechazarAdopcion')}}" method="POST" style="display: none;">
-                                                                        @csrf
-                                                                        <input type="hidden" name="animal_id" value="{{ $adopcion->id_animaladopcion }}">
-                                                                    </form>
-                                                                    <div class="modal-boton1" style="display: flex; justify-content: left;">
-                                                                    <x-secondary-button class="SinfoButton" style="background-color: #c80000; padding: 5%;" onclick="rechazarAdopcion('{{ $adopcion->id_animaladopcion }}')">
-                                                                        @if($adopcion->adoption_status == "En proceso")
-                                                                            Rechazar
-                                                                        @else
-                                                                            Cancelar Proceso
-                                                                        @endif</x-secondary-button>
-                                                                </div>
+                                                            <button type="button" class="btn btn-danger" onclick="rechazarAdopcion('{{ $adopcion->id_animaladopcion }}')">
+                                                                @if($adopcion->adoption_status == "En proceso")
+                                                                    Rechazar
+                                                                @else
+                                                                    Cancelar Proceso
+                                                                @endif
+                                                            </button>
 
+                                                            <form id="aprobarForm{{ $adopcion->id_animaladopcion }}" action="{{ route('AdopcionAdmin.aprobacion') }}" method="POST" style="display: none;">
+                                                                @csrf
+                                                                <input type="hidden" name="animal_id" value="{{ $adopcion->id_animaladopcion }}">
+                                                            </form>
 
-                                                                <!--*****Aprobacion de adopcion******-->
-                                                                <form id="aprobarForm{{ $adopcion->id_animaladopcion }}" action="{{route('AdopcionAdmin.aprobacion')}}" method="POST" style="display: none;">
+                                                                @if($adopcion->adoption_status == "P. Entrega")
+                                                                <form id="concluirForm{{ $adopcion->id_animaladopcion }}" action="{{ route('AdopcionAdmin.conclusionAdopcion') }}" method="POST" style="display: none;">
                                                                     @csrf
                                                                     <input type="hidden" name="animal_id" value="{{ $adopcion->id_animaladopcion }}">
                                                                 </form>
-
-                                                                    @if($adopcion->adoption_status == "P. Entrega")
-                                                                        <form id="concluirForm{{ $adopcion->id_animaladopcion }}" action="{{route('AdopcionAdmin.conclusionAdopcion')}}" method="POST" style="display: none;">
-                                                                            @csrf
-                                                                            <input type="hidden" name="animal_id" value="{{ $adopcion->id_animaladopcion }}">
-                                                                        </form>
-                                                                        <div class="modal-boton2" style="display: flex; justify-content: right;">
-                                                                            <x-primary-button class="SadoptarButton" onclick="concluirAdopcion('{{ $adopcion->id_animaladopcion }}')">Terminar</x-primary-button>
-                                                                        </div>
-
-                                                                    @elseif($adopcion->adoption_status != "P. Vacuna")
-                                                                        <div class="modal-boton2" style="display: flex; justify-content: right;">
-                                                                            <x-primary-button class="SadoptarButton" onclick="aprobacionAdopcion('{{ $adopcion->id_animaladopcion }}')">Aprobar</x-primary-button>
-                                                                        </div>
-                                                                    @endif
-                                                                    <!-----Fin aprobacion------->
-                                                                <!-----Fin aprobacion------->
-
-                                                            </div>
-                                                            <!-- FIN BOTONES DE GESTION------------------------------->
-                                                        </div>
-
-                                                        <div class="modal-column ">
-                                                            <h6 style="font-weight: bold; font-size: 80%; margin-bottom: 1%; font-style: italic">Probabilidad de adopcion: </h6>
-                                                            <h2 class="probabilidad"
-                                                                @if($adopcion->probabilidad <40) style="color: #c80000; text-align: center"
-                                                                @elseif($adopcion->probabilidad >39 && $adopcion->probabilidad<60) style="color: #d39e00; text-align: center"
-                                                                @elseif($adopcion->probabilidad >59 && $adopcion->probabilidad<80)style="color: #28a745;text-align: center"
-                                                                @elseif($adopcion->probabilidad >59 && $adopcion->probabilidad<101)style="color: #007bff;text-align: center"
-                                                                @endif>{{$adopcion->probabilidad}}%</h2>
-                                                            <h2 class="Inf">Información adicional del solicitante</h2>
-                                                            <p>Nombre: {{ $adopcion->users->name}} {{$adopcion->users->lastname}}</p>
-                                                            <p>Identificacion: {{ $adopcion->users->document}}</p>
-                                                            <p>Edad: {{$adopcion->users->age }} años</p>
-                                                            <p>E-mail: {{$adopcion->users->email }}</p>
-                                                            <p>Se unio a Ojitos: {{$adopcion->users->created_at }}</p>
-                                                            <p style="margin-top: 2%;">Motivo de adopcion: {{ $adopcion->motivo }}</p>
-
-                                                            <div class="modal-boton1">
-                                                                <a href="{{ route('admin.descargar-documento', ['userDocument' => $adopcion->id_animaladopcion]) }}">
-                                                                    <button class="SinfoButtonUsuario">Ver documento</button>
-                                                                </a>
-                                                            </div>
+                                                                <button type="button" class="btn btn-success" onclick="concluirAdopcion('{{ $adopcion->id_animaladopcion }}')">Terminar</button>
+                                                            @elseif($adopcion->adoption_status != "P. Vacuna")
+                                                                <button type="button" class="btn btn-primary" onclick="aprobacionAdopcion('{{ $adopcion->id_animaladopcion }}')">Aprobar</button>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- *************FIN DEL MODAL PARA INFORMACIÓN*************** -->
                                         </td>
-
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -472,85 +443,104 @@
         </div>
     </div>
 
-    <!---MODAL TEMPORAL POR PROCESO-->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="loading-message">
-            <p>Procesando actualizacion...</p>
-            <div class="spinner"></div>
-        </div>
-    </div>
-    <!---FINAL MODAL TEMPORAL-->
-
-    <!-- Modal Confirmacion correo -->
-    <div id="myModalc" class="modalc">
-        <!-- <span class="closec">&times;</span> -> "X" para cierre de la ventana-->
-        <div class="modal-contentc py-12">
-            <p class="confirdesc">Estamos enviando informacion a tu correo...</p>
-            <!-- <div class="modal-buttonsc">
-                 <button id="cancelBtnc">Aceptar</button>
-                 Puedes agregar aquí un botón para realizar alguna acción adicional
-             </div>-->
+    <!-- Modal de carga -->
+    <div id="loadingOverlay" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>Procesando actualización...</p>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-
-    <!--*******************************************-->
-    <!-- Cuadro de confirmación TERMINAR PROCESO-->
-    <div id="confirmationModalConcluir" style="display: none">
-        <div id="confirmationBox">
-            <h2 class="con">Confirmación</h2>
-            <p class="parcon">¿Han recogido al Animal?</p>
-            <button id="succesButton" >Confirmar</button>
-            <button id="cancelButton" onclick="closeConfirmationCon()">Cancelar</button>
-        </div>
-    </div>
-    <!----FIN CUADRO DE CONFIRMACION--->
-    <!--***********************************************-->
-
-    <!--*******************************************-->
-    <!-- Cuadro de confirmación RECHAZAR PROCESO-->
-    <div id="confirmationModalRechazar" style="display: none">
-        <div id="confirmationBox">
-            <h2 class="con">Confirmación</h2>
-            <p class="parcon">¿Seguro de rechazar el proceso?</p>
-            <button id="succesRButton" >Confirmar</button>
-            <button id="cancelButton" onclick="closeConfirmationRez()">Cancelar</button>
-        </div>
-    </div>
-    <!----FIN CUADRO DE CONFIRMACION RECHAZO--->
-    <!--***********************************************-->
-
-    <!--*******************************************-->
-    <!-- Cuadro de confirmación APROBAR PROCESO-->
-    <div id="confirmationModalAprobar" style="display: none">
-        <div id="confirmationBox">
-            <h2 class="con">Confirmación</h2>
-            <p class="parcon">¿Desea dar continuidad?</p>
-            <button id="succesAButton" >Confirmar</button>
-            <button id="cancelButton" onclick="closeConfirmationApr()">Cancelar</button>
-        </div>
-    </div>
-    <!----FIN CUADRO DE CONFIRMACION APRBACION--->
-    <!--***********************************************-->
-
-    <!--MODAL PARA IMAGEN-->
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img id="modalImage" class="modal-content" src="" alt="imagen">
-    </div>
-
-    <!-- Cuadro de confirmación Registro -->
-    <div id="confirmationModal">
-        <div id="confirmationBox">
-            <h2 class="con">Confirmación</h2>
-            <p class="parcon">¿Estás seguro de realizar el registro?</p>
-            <x-primary-button onclick="confirmAction()" class="mt-4 flex sm:justify-center h-8">Confirmar</x-primary-button>
-            <button id="cancelButton" onclick="closeConfirmation()">Cancelar</button>
+    <!-- Modal de confirmación de correo -->
+    <div id="myModalc" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>Estamos enviando información a tu correo...</p>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Modal de confirmación de conclusión -->
+    <div id="confirmationModalConcluir" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Han recogido al Animal?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="succesButton">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal de confirmación de rechazo -->
+    <div id="confirmationModalRechazar" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro de rechazar el proceso?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="succesRButton">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal de confirmación de aprobación -->
+    <div id="confirmationModalAprobar" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Desea dar continuidad?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="succesAButton">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para imagen -->
+    <div id="imageModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" class="img-fluid" src="" alt="imagen">
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
     <script>
         //**MODAL TEMPORAL ENTRE PROCESOS
         function showLoading() {
@@ -746,4 +736,4 @@
         });
     </script>
 
-</x-app-layout>
+@endsection

@@ -82,12 +82,14 @@
     }
 </style>
 
-@php
-    // Obtener el ID del animal de la URL
-    $animalId = request()->query('animal_id');
-@endphp
+@extends('layouts.newlayout')
 
-<x-app-layout>
+@section('content')
+    @php
+        // Obtener el ID del animal de la URL
+        $animalId = request()->query('animal_id');
+    @endphp
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Diligencia el formulario') }}
@@ -95,16 +97,13 @@
         <h3 class="font-semibold text-xs text-gray-800 dark:text-gray-200 leading-tight">Si deseas cancelar la solicitud, haz click en la pestaña "¡Adopta!"</h3>
     </x-slot>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!--{{ __("You're logged in!") }}-->
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div id="formContainer" style="display: block;">
+                <form method="POST" action="{{route('Probabilidad')}}" id="FormAdopcion" onsubmit="return validarFormulario()" enctype="multipart/form-data">
+                    @csrf
 
-                        <div id="formContainer" style="display: block;">
-                            <form method="POST" action="{{route('Probabilidad')}}"  id="FormAdopcion" onsubmit="return validarFormulario()" enctype="multipart/form-data">
-                                @csrf
-
-                                <input type="hidden" name="animal_id" value="{{ $animalId }}">
-
+                    <input type="hidden" name="animal_id" value="{{ $animalId }}">
 
 
                                 <!-- Pregunta 1-->
@@ -229,27 +228,24 @@
                                     <x-text-input id="p11" class="block mt-1 w-full" type="text" name="motivo" required autofocus autocomplete="p11" />
                                 </div>
 
-                                <div class="mt-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg divide-y dark:divide-gray-900">
-                                    <div class="container relative">
-                                        <div class="flex sm:justify-between h-8">
-                                            <x-primary-button class="mt-4 flex sm:justify-center h-8" id="openModal">Enviar solicitud</x-primary-button>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </form>
+                    <div class="mt-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg divide-y dark:divide-gray-900">
+                        <div class="container relative">
+                            <div class="flex sm:justify-between h-8">
+                                <x-primary-button class="mt-4 flex sm:justify-center h-8" id="openModal">Enviar solicitud</x-primary-button>
+                            </div>
                         </div>
-                </div>
-            </div> <!-- CIERRE DEL CONTAINER-->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>TAINER-->
 
     <!-- Cuadro de confirmación Actualizacion -->
     <div id="confirmationModal">
         <div id="confirmationBox">
             <h2 class="con">Confirmación</h2>
             <p class="parcon">¿Estás seguro de realizar el registro?</p>
-            <x-primary-button onclick="confirmAction()" class="mt-4 flex sm:justify-center h-8" >Confirmar</x-primary-button>
-            <!--<button id="confirmButton" onclick="confirmAction()">Confirmar</button>-->
+            <x-primary-button onclick="confirmAction()" class="mt-4 flex sm:justify-center h-8">Confirmar</x-primary-button>
             <button id="cancelButton" onclick="closeConfirmation()">Cancelar</button>
         </div>
     </div>
@@ -317,4 +313,4 @@
 
 </script>
 
-</x-app-layout>
+@endsection

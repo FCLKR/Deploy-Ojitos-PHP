@@ -193,57 +193,86 @@
         text-align: center;
     }
 </style>
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Detalles de la Factura #{{ $factura->idfactura }} {{ $factura->users->name }}
-        </h2>
-    </x-slot>
+@extends('layouts.newlayout')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <table class="table mb-4">
-                        <tbody>
-                        <tr>
-                            <th>Fecha:</th>
-                            <td>{{ $factura->fecha_factura }}</td>
-                        </tr>
-                        <tr>
-                            <th>Usuario:</th>
-                            <td>{{ $factura->users->name }}</td>
-                        </tr>
-                        <tr>
-                            <th>Total:</th>
-                            <td>${{ $factura->total_factura }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-
-                    <h2>Detalles de los Productos</h2>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario</th>
-                            <th>iva</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($factura->facturaDetails as $detalle)
+@section('content')
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Información de la Factura #{{ $factura->idfactura }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tbody>
                             <tr>
-                                <td>{{ $detalle->product->product_name }}</td>
-                                <td>{{ $detalle->quantity }}</td>
-                                <td>${{ $detalle->product->product_price }}</td>
-                                <td>${{ $detalle->iva }}</td>
+                                <th>Fecha:</th>
+                                <td>{{ $factura->fecha_factura }}</td>
                             </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                            <tr>
+                                <th>Usuario:</th>
+                                <td>{{ $factura->users->name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Especificación:</th>
+                                <td>{{ $factura->especificacion }}</td>
+                            </tr>
+                            <tr>
+                                <th>Método de Pago:</th>
+                                <td>{{ $factura->metodoPago }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total:</th>
+                                <td>${{ $factura->total_factura }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">Detalles de los Productos</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>IVA</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($factura->facturaDetails as $detalle)
+                                @if($detalle->product->id_product === 15029 || $detalle->product->id_product === 15030)
+                                    @php
+                                        $productoVacuna = $detalle->product->productoVacunas->first();
+                                    @endphp
+                                    @if($productoVacuna)
+                                        <tr>
+                                            <td>{{ $productoVacuna->vacuna->nombre }}</td>
+                                            <td>{{ $detalle->quantity }}</td>
+                                            <td>${{ $productoVacuna->price }}</td>
+                                            <td>${{ $detalle->iva }}</td>
+                                        </tr>
+                                    @endif
+                                @else
+                                    <tr>
+                                        <td>{{ $detalle->product->product_name }}</td>
+                                        <td>{{ $detalle->quantity }}</td>
+                                        <td>${{ $detalle->product->product_price }}</td>
+                                        <td>${{ $detalle->iva }}</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

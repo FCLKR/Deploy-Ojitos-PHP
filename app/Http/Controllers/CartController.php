@@ -4,23 +4,47 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\ProductoVacuna;
+
 
 class CartController extends Controller
 {
-    public function add(Product $product): \Illuminate\Http\RedirectResponse
+    public function add(Request $request, $productId)
     {
         try {
             $cart = session()->get('cart', []);
 
-            if (isset($cart[$product->id_product])) {
-                $cart[$product->id_product]['quantity']++;
+            // Check if the product is a vaccine
+            $productoVacuna = ProductoVacuna::where('producto_id', $productId)->first();
+
+            if ($productoVacuna) {
+                // If the product is a vaccine, use the vaccine details
+                $vacuna = $productoVacuna->vacuna;
+
+                if (isset($cart[$productId])) {
+                    $cart[$productId]['quantity']++;
+                } else {
+                    $cart[$productId] = [
+                        "product_name" => $vacuna->nombre,
+                        "quantity" => 1,
+                        "product_price" => $productoVacuna->price,
+                        "img" => null
+                    ];
+                }
             } else {
-                $cart[$product->id_product] = [
-                    "product_name" => $product->product_name,
-                    "quantity" => 1,
-                    "product_price" => $product->product_price,
-                    "img" => $product->img
-                ];
+                // If the product is not a vaccine, use the generic product details
+                $product = Product::findOrFail($productId);
+
+                if (isset($cart[$productId])) {
+                    $cart[$productId]['quantity']++;
+                } else {
+                    $cart[$productId] = [
+                        "product_name" => $product->product_name,
+                        "quantity" => 1,
+                        "product_price" => $product->product_price,
+                        "img" => $product->img
+                    ];
+                }
             }
 
             session()->put('cart', $cart);

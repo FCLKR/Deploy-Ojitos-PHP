@@ -47,50 +47,60 @@
     }
 </style>
 
-@extends('layouts.cart-layout')
+@extends('layouts.newlayout')
 
 @section('content')
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="T1">Shopping Cart</h2>
-                    @if(session('cart'))
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Subtotal</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach(session('cart') as $id => $details)
-                                <tr>
-                                    <td>{{ $details['product_name'] }}</td>
-                                    <td>
-                                        <input type="number" value="{{ $details['quantity'] }}" class="form-control quantity" data-id="{{ $id }}" style="background-color: #ffffff; color: #000000;" />
-                                        <button class="btn btn-info btn-sm update-cart" data-id="{{ $id }}">Update</button>
-                                    </td>
-                                    <td>${{ $details['product_price'] }}</td>
-                                    <td>${{ $details['product_price'] * $details['quantity'] }}</td>
-                                    <td>
-                                        <button class="remove-button remove-from-cart" data-id="{{ $id }}">Remove</button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    <br>
-                        <a href="{{ route('checkout.form') }}" class="checkout-button">Checkout</a>
-                    @else
-                        <p>Your cart is empty.</p>
-                    @endif
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <h2>Carrito de compras</h2>
+        @if(session('cart'))
+            <table class="table">
+                <thead>
+                <tr>
+                    <th  scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Producto</th>
+                    <th  scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cantidad</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subtotal</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acción</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach(session('cart') as $id => $details)
+                    <tr>
+                        <td>{{ $details['product_name'] }}</td>
+                        <td>
+                            <input type="number" value="{{ $details['quantity'] }}" class="form-control quantity" data-id="{{ $id }}" />
+                        </td>
+                        <td>${{ $details['product_price'] }}</td>
+                        <td>${{ $details['product_price'] * $details['quantity'] }}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm remove-from-cart" data-id="{{ $id }}">Quitar</button>
+                        </td>
+                    </tr>
+                    <div id="confirmationModal" class="modal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmación de Checkout</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas proceder con el checkout?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-success" id="confirmCheckoutButton">Confirmar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+                </tbody>
+            </table>
+            <br>
+            <a href="{{ route('checkout.form') }}" id="checkoutButton" class="btn btn-success">Finalizar comprar</a>
+        @else
+            <p>Tu carrito está vacio.</p>
+        @endif
     </div>
 @endsection
 
@@ -98,10 +108,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('.update-cart').on('click', function (e) {
+            $('.quantity').on('change', function (e) {
                 e.preventDefault();
                 var ele = $(this);
-                var quantity = ele.closest('tr').find('.quantity').val();
+                var quantity = ele.val();
                 $.ajax({
                     url: '{{ route('cart.update') }}',
                     method: "PATCH",
@@ -115,11 +125,22 @@
                     }
                 });
             });
+            $(document).ready(function () {
+                // ...
 
+                $('#checkoutButton').on('click', function (e) {
+                    e.preventDefault();
+                    $('#confirmationModal').modal('show');
+                });
+
+                $('#confirmCheckoutButton').on('click', function () {
+                    window.location.href = "{{ route('checkout.form') }}";
+                });
+            });
             $('.remove-from-cart').on('click', function (e) {
                 e.preventDefault();
                 var ele = $(this);
-                if (confirm("Are you sure you want to remove this item?")) {
+                if (confirm("¿Seguro que quieres quitar este item?")) {
                     $.ajax({
                         url: '{{ route('cart.remove') }}',
                         method: "DELETE",

@@ -193,44 +193,47 @@
         text-align: center;
     }
 </style>
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Mis Facturas
-        </h2>
-    </x-slot>
+@extends('layouts.newlayout')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="T1">Lista de Facturas</h2>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Especificacion</th>
-                            <th>Total</th>
-                            <th>Metodo de Pago</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($facturas as $factura)
+@section('content')
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Lista de Facturas</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
                             <tr>
-                                <td class="fecha">{{ $factura->fecha_factura }}</td>
-                                <td>{{ $factura->especificacion}}</td>
-                                <td>${{ $factura->total_factura }}</td>
-                                <td>{{ $factura->metodoPago }}</td>
-                                <td>
-                                    <a href="{{ route('user.invoice.details', $factura->idfactura) }}" class="custom-button">Ver Detalles</a>
-                                </td>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fecha</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Especificacion</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Metodo de Pago</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                             </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            @foreach($facturas as $factura)
+                                <tr>
+                                    <td class="fecha">{{ $factura->fecha_factura }}</td>
+                                    <td>{{ $factura->especificacion}}</td>
+                                    <td>${{ $factura->total_factura }}</td>
+                                    <td>{{ $factura->metodoPago }}</td>
+                                    <td>
+                                        <a href="{{ route('user.invoice.details', $factura->idfactura) }}" class="btn btn-primary">Ver Detalles</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                        <div class="mt-4">
+                            {{ $facturas->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

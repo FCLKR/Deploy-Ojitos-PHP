@@ -193,58 +193,63 @@
         text-align: center;
     }
 </style>
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Products
-        </h2>
-    </x-slot>
+@extends('layouts.newlayout')
 
+@section('content')
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="T1">Products</h2>
-                    <p><strong>* Los productos que añadas a tu compra, apareceran en la pestaña "carrito" de la parte superior.</strong></p>
-                    <x-text-input id="buscar" type="text" id="searchInput" placeholder="Buscar..." class="hidden sm:flex sm:items-right sm:ml-3"></x-text-input>
-                </div>
+        <div class="container mx-auto px-4">
+            <div class="bg-white dark:bg-gray-800">
+                <div class="p-6">
+                    <h2 class="font-semibold text-xl mb-4">Productos</h2>
+                    <p class="mb-4"><strong>* Los productos que añadas a tu compra, apareceran en la pestaña "carrito" de la parte superior.</strong></p>
+                    <div class="mb-4">
+                        <input id="searchInput" type="text" placeholder="Buscar..." class="form-control">
+                    </div>
+                    <div class="mb-4">
+                        <button id="toggleProductsButton" class="btn btn-primary">Ocultar Productos</button>
+                    </div>
 
-                <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(count($products) > 0)
-                        <div id="tableContainer" style="display: block;">
-                            <table id="dataTable">
-                                <thead>
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($products as $product)
-                                    <tr>
-                                        <td>
-                                            @if($product->img)
-                                                <img src="{{ asset('storage/product_images/' . $product->img) }}" style="max-width: 80px; max-height: 80px;" alt="imagen" onclick="openModal('{{ asset('storage/product_images/' . $product->img) }}')">
-                                            @else
-                                                No hay imagen
+                        <div id="productsTableContainer">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table" id="productsTable">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Image</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                                        @foreach($products as $product)
+                                            @if($product->product_name != 'Vacuna contra la Rabia' && $product->product_name != 'Vacunas Perros' && $product->product_name != 'Vacunas Gatos')
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        @if($product->img)
+                                                            <img src="{{ asset('storage/product_images/' . $product->img) }}" style="max-width: 80px; max-height: 80px;" alt="imagen" class="cursor-pointer" onclick="openModal('{{ asset('storage/product_images/' . $product->img) }}')">
+                                                        @else
+                                                            No hay imagen
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">{{ $product->product_name }}</td>
+                                                    <td class="px-6 py-4">{{ $product->descripcion }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">${{ $product->product_price }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <form action="{{ route('cart.add', $product) }}" method="POST">
+                                                            @csrf
+                                                            <button class="btn btn-info" type="submit">Añadir al carrito</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
                                             @endif
-                                        </td>
-                                        <td>{{ $product->product_name }}</td>
-                                        <td>{{ $product->descripcion }}</td>
-                                        <td>${{ $product->product_price }}</td>
-                                        <td>
-                                            <form action="{{ route('cart.add', $product) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="custom-button">Add to Cart</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     @else
                         <p class="text-gray-500 dark:text-gray-400">No hay productos disponibles.</p>
@@ -254,12 +259,65 @@
         </div>
     </div>
 
-    <!--MODAL PARA IMAGEN-->
+    <div class="py-4">
+        <div class="container mx-auto px-4">
+            <div class="bg-white dark:bg-gray-800">
+                <div class="p-6">
+                    <h2 class="font-semibold text-xl mb-4">Vacunas</h2>
+                    <div class="mb-4">
+                        <input id="searchInputVacunas" type="text" placeholder="Buscar..." class="form-control">
+                    </div>
+                    <div class="mb-4">
+                        <button id="toggleVaccinationsButton" class="btn btn-primary">Mostrar Vacunas</button>
+                    </div>
+
+                    @if(count($vacunas) > 0)
+                        <div id="vaccinationsTableContainer">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table" id="vaccinationsTable">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                                        @foreach($vacunas as $vacuna)
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap">{{ $vacuna->nombre }}</td>
+                                                <td class="px-6 py-4">{{ $vacuna->descripcion }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap">${{ $vacuna->precio }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <form action="{{ route('cart.add', ['product' => $vacuna->producto_id]) }}" method="POST">
+                                                        @csrf
+                                                        <button class="btn btn-info" type="submit">Añadir al carrito</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-gray-500 dark:text-gray-400">No hay vacunas disponibles.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="imageModal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
         <img id="modalImage" class="modal-content" src="" alt="imagen">
     </div>
+@endsection
 
+@section('scripts')
     <script>
         function openModal(imageSrc) {
             var modal = document.getElementById('imageModal');
@@ -274,7 +332,7 @@
         }
 
         const searchInput = document.getElementById('searchInput');
-        const items = document.querySelectorAll('tr');
+        const items = document.querySelectorAll('#productsTable tbody tr');
 
         searchInput.addEventListener('input', function() {
             const searchTerm = searchInput.value.toLowerCase();
@@ -290,5 +348,48 @@
                 }
             });
         });
+
+        const searchInputVacunas = document.getElementById('searchInputVacunas');
+        const itemsVacunas = document.querySelectorAll('#vaccinationsTable tbody tr');
+
+        searchInputVacunas.addEventListener('input', function() {
+            const searchTerm = searchInputVacunas.value.toLowerCase();
+
+            itemsVacunas.forEach(item => {
+                const nombre = item.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const descripcion = item.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                if (nombre.includes(searchTerm) || descripcion.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        const toggleProductsButton = document.getElementById('toggleProductsButton');
+        const toggleVaccinationsButton = document.getElementById('toggleVaccinationsButton');
+        const productsTableContainer = document.getElementById('productsTableContainer');
+        const vaccinationsTableContainer = document.getElementById('vaccinationsTableContainer');
+
+        toggleProductsButton.addEventListener('click', function() {
+            if (productsTableContainer.style.display === 'none') {
+                productsTableContainer.style.display = 'block';
+                toggleProductsButton.textContent = 'Ocultar Productos';
+            } else {
+                productsTableContainer.style.display = 'none';
+                toggleProductsButton.textContent = 'Mostrar Productos';
+            }
+        });
+
+        toggleVaccinationsButton.addEventListener('click', function() {
+            if (vaccinationsTableContainer.style.display === 'none') {
+                vaccinationsTableContainer.style.display = 'block';
+                toggleVaccinationsButton.textContent = 'Ocultar Vacunas';
+            } else {
+                vaccinationsTableContainer.style.display = 'none';
+                toggleVaccinationsButton.textContent = 'Mostrar Vacunas';
+            }
+        });
     </script>
-</x-app-layout>
+@endsection

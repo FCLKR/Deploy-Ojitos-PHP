@@ -193,44 +193,38 @@
         text-align: center;
     }
 </style>
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Lista de Facturas
-        </h2>
-    </x-slot>
+@extends('layouts.newlayout')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="T1">Lista de Facturas</h2>
-                    <table class="table">
-                        <thead>
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">Lista de Facturas</h2>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($facturas as $factura)
                         <tr>
-                            <th>ID</th>
-                            <th>Fecha</th>
-                            <th>Usuario</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
+                            <td>{{ $factura->idfactura }}</td>
+                            <td>{{ $factura->fecha_factura }}</td>
+                            <td>{{ $factura->users->name }}</td>
+                            <td>${{ $factura->total_factura }}</td>
+                            <td>
+                                <a href="{{ route('invoices.show', $factura->idfactura) }}" class="btn btn-primary">Ver Detalles</a>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($facturas as $factura)
-                            <tr>
-                                <td>{{ $factura->idfactura }}</td>
-                                <td class="fecha">{{ $factura->fecha_factura }}</td>
-                                <td>{{ $factura->users->name }}</td>
-                                <td>${{ $factura->total_factura }}</td>
-                                <td>
-                                    <a href="{{ route('invoices.show', $factura->idfactura) }}" class="custom-button">Ver Detalles</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

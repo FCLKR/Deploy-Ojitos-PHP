@@ -78,104 +78,100 @@
     color: #ffffff;
     }
 </style>
+@extends('layouts.newlayout')
 
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Editar registro') }}
-        </h2>
-    </x-slot>
+@section('title', 'Editar registro')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <!--{{ __("You're logged in!") }}-->
-
-                    <form method="POST" action="{{route('Animals.update' , $animal)}}" id="miFormulario" onsubmit="return validarFormulario()" enctype="multipart/form-data">
-                        @csrf @method('PUT')
-                        <!--Fecha de encuentro-->
-                        <div class="mt-3">
-                            <x-input-label for="fechaEncuentro" :value="__('¿Cuando se encontro')" />
-                            <x-text-input id="fechaEncuentro" class="block mt-1 w-full" type="date" name="fechaEncuentro" :value="old('fechaEncuentro',$animal->fechaEncuentro)" :min="date('Y-m-d')" required autofocus autocomplete="fechaEncuentro" />
-                            <x-input-error :messages="$errors->get('fechaEncuentro')" class="mt-2" />
-                        </div>
-
-                        <!--Especie-->
-                        <div class="mt-3 select-container">
-                            <x-input-label for="especie_Animal" :value="__('Especifique la especie')" />
-                            <select id="especie_Animal" class="block mt-1" name="especie_Animal">
-                                <option value="{{$animal->especie_Animal}}">{{$animal->especie_Animal}}</option>
-                                @if($animal->especie_Animal=='Gato')
-                                <option value="Perro">Perro</option>
-                                @else
-                                <option value="Gato">Gato</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        <!--Nombre asignado-->
-                        <div class="mt-3">
-                            <x-input-label for="nombreAnimaladopocion" :value="__('Nombre asignado')" />
-                            <x-text-input id="nombreAnimaladopocion" class="block mt-1 w-full" type="text" name="nombreAnimaladopocion" :value="old('nombreAnimaladopocion',$animal->nombreAnimaladopocion)" required autofocus autocomplete="nombreAnimaladopocion" pattern="[a-zA-Z\s]+" title="Por favor, ingrese solo letras para el Nombre"/>
-                            <x-input-error :messages="$errors->get('nombreAnimaladopocion')" class="mt-2" />
-                        </div>
-
-                        <!--Raza-->
-                        <div class="mt-3">
-                            <x-input-label for="raza" :value="__('cual es la raza')" />
-                            <x-text-input id="raza" class="block mt-1 w-full" type="text" name="raza" :value="old('raza',$animal->raza)" required autofocus autocomplete="raza" pattern="[a-zA-Z\s]+" title="Por favor, ingrese solo letras para la raza"/>
-                            <x-input-error :messages="$errors->get('raza')" class="mt-2" />
-                        </div>
-
-                        <!--Edad-->
-                        <div class="mt-3">
-                            <x-input-label for="age" :value="__('¿Cual es la edad? (meses)')" />
-                            <x-text-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age', $animal->age)" required autofocus autocomplete="age" />
-                            <x-input-error :messages="$errors->get('age')" class="mt-2" />
-                        </div>
-
-                        <!--Observaciones-->
-                        <div class="mt-3">
-                            <x-input-label for="observacionesAnimal" :value="__('Que observaciones')" />
-                            <x-text-input id="observacionesAnimal" class="block mt-1 w-full" type="text" name="observacionesAnimal" :value="old('observacionesAnimal',$animal->observacionesAnimal)" required autofocus autocomplete="observacionesAnimal" />
-                            <x-input-error :messages="$errors->get('observacionesAnimal')" class="mt-2" />
-                        </div>
-
-
-                        <div class="mt-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg divide-y dark:divide-gray-900">
-                            <div class="container relative">
-                                <div class="flex sm:justify-between h-8">
-                                    <!--Imagen-->
-                                    <div class="mt-3">
-                                        <x-input-label for="img" :value="__('Subir Imgen del animal')" />
-                                        <input id="img" class="block mt-1 w-full" type="file" name="img" />
-                                        <!--<x-input-error :messages="$errors->get('observacionesAnimal')" class="mt-2" />-->
-                                    </div>
-                                    <x-primary-button class="mt-4 flex sm:justify-center h-8" >Actualizar Registro</x-primary-button>
-                                </div>
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>{{ __('Editar registro') }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('Animals.update', $animal) }}" id="miFormulario" onsubmit="return validarFormulario()" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="fechaEncuentro" class="form-label">{{ __('¿Cuando se encontro') }}</label>
+                                <input type="date" id="fechaEncuentro" class="form-control" name="fechaEncuentro" value="{{ old('fechaEncuentro', $animal->fechaEncuentro) }}" min="{{ date('Y-m-d') }}" required autofocus autocomplete="fechaEncuentro">
+                                @error('fechaEncuentro')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
-                        </div>
-
-
-                    </form>
-
+                            <div class="mb-3">
+                                <label for="especie_Animal" class="form-label">{{ __('Especifique la especie') }}</label>
+                                <select id="especie_Animal" class="form-select" name="especie_Animal">
+                                    <option value="{{ $animal->especie_Animal }}">{{ $animal->especie_Animal }}</option>
+                                    @if($animal->especie_Animal == 'Gato')
+                                        <option value="Perro">Perro</option>
+                                    @else
+                                        <option value="Gato">Gato</option>
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nombreAnimaladopocion" class="form-label">{{ __('Nombre asignado') }}</label>
+                                <input type="text" id="nombreAnimaladopocion" class="form-control" name="nombreAnimaladopocion" value="{{ old('nombreAnimaladopocion', $animal->nombreAnimaladopocion) }}" required autofocus autocomplete="nombreAnimaladopocion" pattern="[a-zA-Z\s]+" title="Por favor, ingrese solo letras para el Nombre">
+                                @error('nombreAnimaladopocion')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="raza" class="form-label">{{ __('¿Cuál es la raza?') }}</label>
+                                <input type="text" id="raza" class="form-control" name="raza" value="{{ old('raza', $animal->raza) }}" required autofocus autocomplete="raza" pattern="[a-zA-Z\s]+" title="Por favor, ingrese solo letras para la raza">
+                                @error('raza')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="age" class="form-label">{{ __('¿Cuál es la edad? (meses)') }}</label>
+                                <input type="number" id="age" class="form-control" name="age" value="{{ old('age', $animal->age) }}" required autofocus autocomplete="age">
+                                @error('age')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="observacionesAnimal" class="form-label">{{ __('¿Qué observaciones?') }}</label>
+                                <input type="text" id="observacionesAnimal" class="form-control" name="observacionesAnimal" value="{{ old('observacionesAnimal', $animal->observacionesAnimal) }}" required autofocus autocomplete="observacionesAnimal">
+                                @error('observacionesAnimal')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="img" class="form-label">{{ __('Subir imagen del animal') }}</label>
+                                <input type="file" id="img" class="form-control" name="img">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Actualizar Registro</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Cuadro de confirmación Actualizacion -->
-    <div id="confirmationModal">
-        <div id="confirmationBox">
-            <h2 class="con">Confirmación</h2>
-            <p class="parcon">¿Estás seguro de realizar el registro?</p>
-            <x-primary-button onclick="confirmAction()" class="mt-4 flex sm:justify-center h-8" >Confirmar</x-primary-button>
-            <!--<button id="confirmButton" onclick="confirmAction()">Confirmar</button>-->
-            <button id="cancelButton" onclick="closeConfirmation()">Cancelar</button>
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de realizar el registro?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="confirmAction()">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
         </div>
     </div>
-
+@endsection
+@section('scripts')
     <script>
         function validarFormulario() {
             // Validar los campos del formulario
@@ -210,4 +206,4 @@
         }
 
     </script>
-</x-app-layout>
+@endsection

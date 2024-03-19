@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Factura;
 use App\Models\FacturaDetail;
+use App\Models\ProductoVacuna;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class CheckoutController extends Controller
 {
     public function showCheckoutForm()
     {
-        return view('ProductUser.checkout');
+        $metodoPago = ['Efectivo', 'Tarjeta de Credito', 'PayPal'];
+        return view('ProductUser.checkout', compact('metodoPago'));
     }
+
 
     public function processCheckout(Request $request)
     {
@@ -42,6 +44,8 @@ class CheckoutController extends Controller
         $factura = new Factura();
         $factura->fecha_factura = now();
         $factura->usuarios_id_usuario = Auth::id();
+        $factura->especificacion = 'Compra de productos';
+        $factura->metodoPago = $request->input('payment_method');
         $factura->valor_factura = $totalValue;
         $factura->iva = $totalIva;
         $factura->total_factura = $totalInvoice; // Assign the total invoice amount to the total_factura field
@@ -49,14 +53,29 @@ class CheckoutController extends Controller
 
         // Create factura_details records for each item in the cart
         foreach ($cart as $productId => $item) {
-            $facturaDetail = new FacturaDetail();
-            $facturaDetail->factura_idfactura = $factura->idfactura;
-            $facturaDetail->product_id_product = $productId;
-            $facturaDetail->quantity = $item['quantity'];
-            $facturaDetail->products_totals = $item['product_price'] * $item['quantity'];
-            $facturaDetail->iva = $item['product_price'] * $item['quantity'] * 0.19; // Assuming 19% tax rate
-            $facturaDetail->descriptionF = $item['product_name'];
-            $facturaDetail->save();
+            $productoVacuna = ProductoVacuna::where('producto_id', $productId)->first();
+
+            if ($productoVacuna) {
+                // If the product is a vaccine, use the vaccine details
+                $facturaDetail = new FacturaDetail();
+                $facturaDetail->factura_idfactura = $factura->idfactura;
+                $facturaDetail->product_id_product = $productId;
+                $facturaDetail->quantity = $item['quantity'];
+                $facturaDetail->products_totals = $productoVacuna->price * $item['quantity'];
+                $facturaDetail->iva = $productoVacuna->price * $item['quantity'] * 0.19; // Assuming 19% tax rate
+                $facturaDetail->descriptionF = $item['product_name'];
+                $facturaDetail->save();
+            } else {
+                // If the product is not a vaccine, use the generic product details
+                $facturaDetail = new FacturaDetail();
+                $facturaDetail->factura_idfactura = $factura->idfactura;
+                $facturaDetail->product_id_product = $productId;
+                $facturaDetail->quantity = $item['quantity'];
+                $facturaDetail->products_totals = $item['product_price'] * $item['quantity'];
+                $facturaDetail->iva = $item['product_price'] * $item['quantity'] * 0.19; // Assuming 19% tax rate
+                $facturaDetail->descriptionF = $item['product_name'];
+                $facturaDetail->save();
+            }
         }
 // Clear the cart session
         session()->forget('cart');
