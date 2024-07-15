@@ -1,0 +1,13 @@
+{
+  "build": {
+    "env": {
+      "NPM_FLAGS": "--prefix=/vercel/path0"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/public/index.php"
+    }
+  ]
+}
